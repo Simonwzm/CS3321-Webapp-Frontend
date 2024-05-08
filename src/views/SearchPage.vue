@@ -1,0 +1,352 @@
+<template>
+<div class="wrapper flex flex-row justify-center" style="width:1800px">
+<div class="min-h-full  flex flex-col justify-start  w-4/5 " >
+
+
+  <div class="flex justify-center items-center space-x-6 pt-4 w-full" style="height:100px"  >
+    <div class=" flex items-center h-full  align-middle " v-for="(tab, index) in tabs" :key="index" :class="['tab', { 'active-tab': activeTab === index }]" @click="selectTab(index)">
+      {{ tab }}
+    </div>
+    <div class="text-2xl items-end">
+      <i class="fas fa-user pl-10"></i>
+    </div>
+  </div>
+  <div class="relative " style="min-height: 90vh;">
+    <!-- <div class="ring-binder" v-for="index in 5" :key="index"></div> -->
+    <div class="flex flex-row  justify-start note-paper min-h-full z-1 w-full" >
+      <!-- <div class="tape" v-for="index in 5" :key="index"></div> -->
+      <div class="middle-line w-14 " >
+        <!-- <img src="../assets/middle-line.png" alt=""> -->
+      </div>
+      <div class="wrapper1 w-11/12 flex flex-col note-paper2 min-h-full z-1" >
+          <div class="input-search-line h-12">
+            <input class="text-lg h-full font-bold mb-4 w-2/3 border-2 border-gray-300 rounded-lg" placeholder="   result for: naive-ui"></input>
+            <div class="search-pane inline-flex justify-start align-middle w-1/3 pl-5">
+                <n-button> 111 </n-button> 
+            </div>
+
+          </div>
+            <br />
+            <!-- <div class="h-32 bg-gray-200 mb-4" v-for="index in 1" :key="index"></div> -->
+      <!-- <template> -->
+          <!-- </template> -->
+          <div class="empty-show z-2" v-if="false">
+            <div class="empty-bg">
+              Search list empty.
+            </div>
+          </div>
+          <n-list hoverable clickable v-for="index in 9" class="bg-gray-200 mb-4 z-2 bg-opacity-20">
+            
+            <n-list-item content-style="z-index:2">
+              <!-- <template #prefix class="bg-force z-10 w-1000 h-full bg-emerald-200 relative block" > -->
+              <!-- </template> -->
+
+              <div class="bg-force" >
+              </div>
+              <n-thing title="Better Late Than Never" content-style="margin-top: 0 10px; padding-bottom:0px" style="z-index:2;position:relative" >
+                <template #description class="z-2">
+                  <n-space size="small" style="margin-top: 4px" class="z-3">
+                    <n-tag :bordered="false" type="info" size="small">
+                      Tag A
+                    </n-tag>
+                    <n-tag :bordered="false" type="info" size="small">
+                      Tag B
+                    </n-tag>
+                  </n-space>
+                </template>
+                Lorem ipsum dolor sit amet,<br>
+                consectetur adipiscing elit,<br>
+                sed do eiusmod tempor incididunt<br>
+                ut labore et dolore magna aliqua.<br>
+                Ut enim ad minim veniam,<br>
+                quis nostrud exercitation ullamco
+              </n-thing>
+            </n-list-item>
+          </n-list>
+      </div>
+
+      <div class="flex  flex-col justify-center items-start space-x-6 pt-4 w-1/12 h-full mt-40"   >
+        <div class=" flex items-center w-full  align-middle mt-40" style="margin: 50px 0px">
+          <div class="tab2" style="background-color:lightpink">
+            <n-button @click="showModal = true">
+              Start me up
+            </n-button>
+            <n-modal v-model:show="showModal">
+              <n-card
+                style="width: 600px"
+                title="Modal"
+                :bordered="false"
+                size="huge"
+                role="dialog"
+                aria-modal="true"
+              >
+                <template #header-extra>
+                  Oops!
+                </template>
+                Content
+                <template #footer>
+                  Footer
+                </template>
+              </n-card>
+            </n-modal>
+          </div>
+        </div>
+        <div class=" flex items-center w-full  align-middle mt-40" style="margin: 50px 0px">
+          <div class="tab2" style="background-color:lightgreen">
+            <n-button @click="activate('right')">
+              Right
+            </n-button>
+            <n-drawer
+              v-model:show="active"
+              :default-width="1024"
+              :placement="placement"
+              resizable
+            >
+
+              <n-drawer-content title="Stoner">
+                Stoner is a 1965 novel by the American writer John Williams.
+                123oiuhoiuhoasdcsdc
+                <GraphComponent />
+              </n-drawer-content>
+
+            </n-drawer>         
+
+          </div>
+        </div>
+        <div class=" flex items-center w-full  align-middle mt-40" style="margin: 50px 0px">
+          <div class="tab2" style="background-color:lightskyblue">
+            <button class="btnn" style="width: 100%; height: 100%; border: none; background: none; color: inherit" @click="showModal = true">
+              123
+            </button>
+          </div>
+        </div>
+
+        <!-- <div class="flex items-center w-full mt-40" style="margin: 50px 0;">
+          <div class="tab2 bg-lightskyblue transition-all duration-1500 ease-in-out transform origin-right hover:scale-200">132</div>
+        </div> -->
+
+
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+</template>
+
+<script>
+import { NList } from 'naive-ui'
+import { NButton } from 'naive-ui'
+import { NEmpty } from 'naive-ui';
+import { NModal } from 'naive-ui';
+// import type { DrawerPlacement } from 'naive-ui'
+import { defineComponent, ref } from 'vue'
+
+// import component GraphComponent.vue from /compoonents dir
+import GraphComponent from '../components/GraphComponent.vue'
+
+export default {
+  components: {
+    NList,
+    NButton,
+    NEmpty,
+    NModal,
+    GraphComponent,
+  },
+  name: 'SearchPage',
+  data() {
+    return {
+      showModal: ref(false),
+      activeTab: 0,
+      tabs: ['Course Stack', 'Chapter', 'Homework', 'Experiment', 'Reference'],
+
+      /* drawer vars */
+      active: false,
+      placement: "right"
+    };
+  },
+  methods: {
+    selectTab(index) {
+      this.activeTab = index;
+    },
+
+    activate(place) {
+      this.active = true;
+      this.placement = place;
+    }
+  },
+};
+</script>
+
+<style scoped>
+/* body {
+  background-color: #FFF8DC;
+  font-family: 'Arial', sans-serif;
+} */
+/* #app {
+    dis
+} */
+.btnn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+div.empty-show {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width:100%;
+  font-size: 1.5rem;
+  color: #666;
+}
+
+div.empty-show > div.empty-bg {
+  background-image: url(../assets/bianqian.png);
+  background-size: 100% 100%;
+  width:60%;
+  height:60%;
+  text-align: center;
+  line-height: 650px;
+}
+
+.bg-force {
+position: absolute; left:-25px; top: -25px; width:1100px; height:300px; opacity: 1;
+background-image: url(../assets/paper-piece.png);
+background-size: 100% 90%;
+background-repeat: no-repeat;
+color:black;
+z-index: 0;
+}
+
+.middle-line  {
+  background-image: url(../assets/middle-line.png);
+  background-size:100% 10%;
+  opacity:1;
+
+
+}
+
+.n-thing-main {
+  z-index: 10;
+}
+
+.tab {
+  background-color: #D2B48C;
+  padding: 10px 30px;
+  margin: 0 5px;
+  border-radius: 10px 10px 0 0;
+  font-weight: bold;
+}
+
+.tab2 {
+  background-color: aliceblue;
+  padding: 10px 30px;
+  margin: 0 5px;
+  margin-left: -10px;
+  border-radius: 0px 10px 10px 0px;
+  font-weight: bold;
+  height: 200px;
+  width: 90px;
+  line-height: 200px;
+  box-shadow: 5px 5px 5px 0 rgba(0, 0, 0, 0.2);
+  transition: width ease-in-out 0.5s;
+}
+
+.tab2:hover {
+  width: 115px;
+}
+
+.active-tab {
+  background-color: #F5DEB3;
+}
+
+.note-paper {
+  background-color: #F5DEB3;
+  background: linear-gradient(to right, #F5DEB3 , #f3d294);
+  box-shadow: 5px 5px 5px 0 rgba(0, 0, 0, 0.2);
+  margin: 0px;
+  padding: 20px;
+  border-radius: 15px;
+  position: relative;
+}
+
+
+.note-paper2 {
+  /* background-color: #F5DEB3; */
+  background-color: #F5DEB3;
+  /* background: linear-gradient(to right, #F5DEB3 , #dbbe87); */
+  box-shadow: 10px 5px 5px 0 rgba(0, 0, 0, 0.2);
+  margin: 0px;
+  padding: 20px;
+  border-radius: 15px;
+  position: relative;
+}
+
+.tape {
+  width: 50px;
+  height: 20px;
+  background-color: #F5DEB3;
+  position: absolute;
+  top: -10px;
+  transform: rotate(-5deg);
+}
+
+.tape:before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 5px;
+  background-color: #D2B48C;
+  bottom: 0;
+}
+
+.tape:nth-child(2) {
+  top: -10px;
+  left: 50px;
+}
+
+.tape:nth-child(3) {
+  top: -10px;
+  right: 50px;
+}
+
+.tape:nth-child(4) {
+  bottom: -10px;
+  left: 50px;
+}
+
+.tape:nth-child(5) {
+  bottom: -10px;
+  right: 50px;
+}
+
+.ring-binder {
+  width: 20px;
+  height: 20px;
+  background-color: #D3D3D3;
+  border-radius: 50%;
+  position: absolute;
+  left: -30px;
+}
+
+.ring-binder:nth-child(6) {
+  top: 20px;
+}
+
+.ring-binder:nth-child(7) {
+  top: 120px;
+}
+
+.ring-binder:nth-child(8) {
+  top: 220px;
+}
+
+.ring-binder:nth-child(9) {
+  top: 320px;
+}
+
+.ring-binder:nth-child(10) {
+  top: 420px;
+}
+</style>
