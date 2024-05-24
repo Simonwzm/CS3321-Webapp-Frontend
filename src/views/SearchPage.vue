@@ -19,11 +19,16 @@
         <!-- <img src="../assets/middle-line.png" alt=""> -->
       </div>
       <div class="wrapper1 w-11/12 flex flex-col note-paper2 min-h-full z-1" >
-          <div class="input-search-line h-12">
-            <input class="text-lg h-full font-bold mb-4 w-2/3 border-2 border-gray-300 rounded-lg" placeholder="   result for: naive-ui"></input>
-            <div class="search-pane inline-flex justify-start align-middle w-1/3 pl-5">
-                <n-button> 111 </n-button> 
+          <div class="input-search-line h-10 flex-row w-full justify-start items-center">
+            <input class="text-lg h-full font-bold mb-4 w-1/2 border-2 border-gray-300 rounded-lga" placeholder="   result for: naive-ui" v-model="message" @keyup.enter="submitValue" ></input>
+            <div class="select_container w-1/3 ml-10 inline-block h-full z-11" style="line-height:2.5em">
+            <n-space vertical>
+              <n-select v-model:value="cur_search_value" multiple :options="search_options" size="large" />
+            </n-space>
             </div>
+            <!-- <div class="search-pane inline-flex justify-start align-middle w-1/3 pl-5">
+                <n-button> 111 </n-button> 
+            </div> -->
 
           </div>
             <br />
@@ -35,7 +40,7 @@
               Search list empty.
             </div>
           </div>
-          <n-list hoverable clickable v-for="index in 9" class="bg-gray-200 mb-4 z-2 bg-opacity-20">
+          <n-list hoverable clickable v-for="course_info in this.flattend_retrieved_list" class="bg-gray-200 mb-4 z-2 bg-opacity-20">
             
             <n-list-item content-style="z-index:2">
               <!-- <template #prefix class="bg-force z-10 w-1000 h-full bg-emerald-200 relative block" > -->
@@ -43,23 +48,19 @@
 
               <div class="bg-force" >
               </div>
-              <n-thing title="Better Late Than Never" content-style="margin-top: 0 10px; padding-bottom:0px" style="z-index:2;position:relative" >
+              <h2> {{ this.message }}</h2>
+              <n-thing content-style="margin-top: 0 10px; padding-bottom:0px" style="z-index:2;position:relative" >
                 <template #description class="z-2">
                   <n-space size="small" style="margin-top: 4px" class="z-3">
                     <n-tag :bordered="false" type="info" size="small">
-                      Tag A
+                      {{ course_info.course_name }}
                     </n-tag>
                     <n-tag :bordered="false" type="info" size="small">
-                      Tag B
+                      {{ course_info.entry_type }}
                     </n-tag>
                   </n-space>
                 </template>
-                Lorem ipsum dolor sit amet,<br>
-                consectetur adipiscing elit,<br>
-                sed do eiusmod tempor incididunt<br>
-                ut labore et dolore magna aliqua.<br>
-                Ut enim ad minim veniam,<br>
-                quis nostrud exercitation ullamco
+                
               </n-thing>
             </n-list-item>
           </n-list>
@@ -142,6 +143,7 @@ import { NModal } from 'naive-ui';
 // import type { DrawerPlacement } from 'naive-ui'
 import { defineComponent, ref } from 'vue'
 
+import axios from 'axios';
 // import component GraphComponent.vue from /compoonents dir
 import GraphComponent from '../components/GraphComponent.vue'
 
@@ -159,13 +161,53 @@ export default {
       showModal: ref(false),
       activeTab: 0,
       tabs: ['Course Stack', 'Chapter', 'Homework', 'Experiment', 'Reference'],
+      cur_search_value: ['all',],
+      search_options: [
+        { label: 'All', value: 'all' },
+        { label: 'Announcement', value: 'announcement' },
+        { label: 'Video', value: 'video' },
+        { label: 'Assignment', value: 'assignment' },
+        { label: 'File', value: 'file' },
+        { label: 'Moudle', value: 'module' },
+      ],
 
       /* drawer vars */
       active: false,
-      placement: "right"
+      placement: "right",
+      course_list: [],
+      message: "",
+      retrieved_list: [],
     };
   },
+  computed: {
+    // computed property for the search result
+    flattend_retrieved_list() {
+      let res_vec = [];
+      for (let i=0; i<this.retrieved_list.length; i++) {
+        // for each key in this object
+        let course_name = "";
+        for (let key in this.retrieved_list[i]) {
+          if (key === "course_name") {
+            course_name = this.retrieved_list[i][key];
+          } else {
+            for (let j=0; j<this.retrieved_list[i][key].length; j++) {
+              res_vec.push({
+                course_name: course_name,
+                entry_type: key,
+                priv_data: this.retrieved_list[i][key][j]
+              });
+            }
+          }
+        } 
+      }
+      return res_vec;
+    },
+  },
   methods: {
+    submitValue() {
+      this.SendCourseSearch(this.message, this.cur_search_value);
+    },
+
     selectTab(index) {
       this.activeTab = index;
     },
@@ -173,6 +215,19 @@ export default {
     activate(place) {
       this.active = true;
       this.placement = place;
+    },
+
+    SendCourseSearch(title, modules) {
+      // send post request to localhost:3000/search with parameter title and module as payload
+      axios.post('http://localhost:3001/search', {
+        keyword: title,
+        modules: modules
+      }).then((response) => {
+        this.retrieved_list = response.data[0];
+        console.log(this.retrieved_list);
+      }).catch((error) => {
+        console.log(error);
+      });
     }
   },
 };
@@ -223,7 +278,6 @@ z-index: 0;
   background-image: url(../assets/middle-line.png);
   background-size:100% 10%;
   opacity:1;
-
 
 }
 

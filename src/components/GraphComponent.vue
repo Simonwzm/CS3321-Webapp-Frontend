@@ -51,7 +51,16 @@
         <div class="panel-footer">
           <button @click="voteInMovie(movieDetails.title)">Vote</button>
         </div>
+
       </div>
+
+    </div>
+    <n-space vertical>
+      <n-select v-model:value="course" :options="course_opt" @update:value="handleGraphChange" />
+      <n-select v-model:value="course" disabled :options="course_opt" />
+    </n-space>
+    <div class="switch-graph">
+      <button @click="loadGraphData2()">Switch Graph</button>
     </div>
   </div>
 </template>
@@ -90,6 +99,33 @@ export default {
     'v-chart': ECharts
   },
   setup() {
+    const course = ref('CS1604');
+    const course_opt = [
+      {
+        label: 'CS1604',
+        value: 'CS1604'
+      },
+      {
+        label: 'CS1605',
+        value: 'CS1605'
+      },
+      {
+        label: 'OS',
+        value: 'OS'
+      },
+      {
+        label: 'DAG',
+        value: 'DAG'
+      },
+      {
+        label: 'UNIVERSITY_PHYSICS_1',
+        value: 'UNIVERSITY_PHYSICS_1'
+      },
+      {
+        label: 'UNIVERSITY_PHYSICS_2',
+        value: 'UNIVERSITY_PHYSICS_2'
+      }
+    ]
     const searchQuery = ref('Matrix');
     const movies = ref([]);
     const movieDetails = ref({});
@@ -120,43 +156,180 @@ export default {
         });
     }
 
-    function loadGraphData() {
-      axios.get('/graph').then(response => {
-        const graph = response.data;
-        // log the datas
-        console.log(graph);
-        chartOption.value = {
-          tooltip: {},
-          series: [
-            {
-              type: 'graph',
-              layout: 'force',
-              data: graph.nodes.map(node => ({
-                ...node,
-                symbolSize: 10,
-                category: node.label,
-                draggable: true
-              })),
-              edges: graph.links.map(link => ({
-                ...link,
-                value: link.value
-              })),
-              force: {
-                edgeLength: 30,
-                repulsion: 250
-              },
-              categories: [{ name: 'actor' }, { name: 'movie' }],
+    // function loadGraphData() {
+    //   axios.get('/graph').then(response => {
+    //     const graph = response.data;
+    //     // log the datas
+    //     console.log(graph);
+    //     chartOption.value = {
+    //       tooltip: {},
+    //       series: [
+    //         {
+    //           type: 'graph',
+    //           layout: 'force',
+    //           data: graph.nodes.map(node => ({
+    //             ...node,
+    //             symbolSize: 10,
+    //             category: node.label,
+    //             draggable: true
+    //           })),
+    //           edges: graph.links.map(link => ({
+    //             ...link,
+    //             value: link.value
+    //           })),
+    //           force: {
+    //             edgeLength: 30,
+    //             repulsion: 250
+    //           },
+    //           categories: [{ name: 'actor' }, { name: 'movie' }],
+    //         }
+    //       ]
+    //     };
+    //   });
+    // }
+function loadGraphData() {
+  axios.get('/graph').then(response => {
+    const graph = response.data;
+    console.log(graph); // It's good practice to log and verify the data structure
+    chartOption.value = {
+      tooltip: {
+        formatter: function (params) {
+          if (params.dataType === 'node') {
+            // Ensure the correct properties are used. Adjust 'label' and 'title' as per your data structure.
+            return `${params.data.label}: ${params.data.title}`;
+          } else if (params.dataType === 'edge') {
+            // This assumes that the edge tooltip should show connected node indices; customize as needed
+            return `Connection between node ${params.data.source} and node ${params.data.target}`;
+
+          }
+        }
+      },
+      series: [
+        {
+          type: 'graph',
+          layout: 'force',
+          roam: true, // Enable user panning and zooming on the graph
+          data: graph.nodes.map(node => ({
+            ...node,
+            symbolSize: 20,
+            category: node.label,
+            draggable: true,
+            label: {
+              show: true,
+              formatter: '{b}', // Ensure the node label is set correctly
+              position: 'bottom'
             }
-          ]
+          })),
+          edges: graph.links.map(link => ({
+            ...link,
+            lineStyle: {
+              width: 2,
+              color: '#ccc'
+            }
+          })),
+          force: {
+            edgeLength: [50, 100],
+            repulsion: 500
+          },
+          categories: [
+            { name: 'actor' },
+            { name: 'movie' }
+          ],
+        }
+      ]
+    };
+  });
+}
+
+ function loadGraphData2(course) {
+      // append course name to url and send get request
+      let url = "http://localhost:8000/course/rels/" + course;
+      console.log(url);
+      axios.get(url).then(response => {
+        const graph = response.data;
+
+        const nodes = [];
+        const nodeMap = new Map();
+        const edges = [];
+
+        // Process nodes and edges
+        graph.forEach(item => {
+          if (!nodeMap.has(item.start.name)) {
+            nodes.push({ name: item.start.name, category: item.start.category || 'default', symbolSize: 20 });
+            nodeMap.set(item.start.name, nodes.length - 1);
+          }
+          if (!nodeMap.has(item.end.name)) {
+            nodes.push({ name: item.end.name, category: item.end.category || 'default', symbolSize: 20 });
+            nodeMap.set(item.end.name, nodes.length - 1);
+          }
+          edges.push({ source: nodeMap.get(item.start.name), target: nodeMap.get(item.end.name), name: item.rel.name });
+        });
+
+        const categories = Array.from(new Set(nodes.map(node => node.category))).map(category => ({ name: category }));
+
+        chartOption.value ={
+          tooltip: {
+            formatter: function (params) {
+              if (params.dataType === 'node') {
+                return `${params.data.name}`;
+              } else if (params.dataType === 'edge') {
+                return `${params.data.source} -> ${params.data.target}: ${params.data.name}`;
+              }
+            }
+          },
+          legend: [{
+            data: categories.map(a => a.name),
+            selected: categories.reduce((acc, category) => {
+              acc[category.name] = true;
+              return acc;
+            }, {})
+          }],
+          series: [{
+            type: 'graph',
+            layout: 'force',
+            categories,
+            data: nodes.map(node => ({
+              ...node,
+              label: {
+                show: true,
+                position: 'right'
+              }
+            })),
+            edges: edges.map(edge => ({
+              ...edge,
+              lineStyle: {
+                normal: {
+                  width: 2,
+                  curveness: 0.3
+                }
+              }
+            })),
+            roam: true,
+            label: {
+              position: 'right',
+              formatter: '{b}'
+            },
+            force: {
+              repulsion: 1000,
+              edgeLength: [50, 150]
+            }
+          }]
         };
+      }).catch(error => {
+        console.error('Graph data loading error:', error);
       });
     }
+
+    function handleGraphChange(course) {
+      loadGraphData2(course);
+    }
+
 
     onMounted(() => {
       loadGraphData();
     });
 
-    return { searchQuery, movies, movieDetails, search, showMovie, voteInMovie, chartOption };
+    return { course, course_opt, searchQuery, movies, movieDetails, search, showMovie, voteInMovie, chartOption, loadGraphData2 , handleGraphChange};
   }
 }
 </script>
