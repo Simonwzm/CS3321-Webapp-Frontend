@@ -40,17 +40,33 @@
               Search list empty.
             </div>
           </div>
-          <n-list hoverable clickable v-for="course_info in this.flattend_retrieved_list" class="bg-gray-200 mb-4 z-2 bg-opacity-20">
+          <n-list hoverable clickable v-for="course_info in this.flattend_retrieved_list" class="bg-gray-200 mb-20 z-2 bg-opacity-20" @click="handleListClick(course_info)">
             
-            <n-list-item content-style="z-index:2">
+            <n-list-item content-style="z-index:2" >
               <!-- <template #prefix class="bg-force z-10 w-1000 h-full bg-emerald-200 relative block" > -->
               <!-- </template> -->
 
               <div class="bg-force" >
               </div>
-              <h2> {{ this.message }}</h2>
-              <n-thing content-style="margin-top: 0 10px; padding-bottom:0px" style="z-index:2;position:relative" >
-                <template #description class="z-2">
+  <n-thing content-indented content-style="margin-top: 0 10px; padding-bottom:0px" style="z-index:2;position:relative" >
+    <template  #avatar class="z-2">
+      <n-avatar>
+        <n-icon>
+          <AttachFileFilled v-if="course_info.entry_type=='files'"/>
+          <OndemandVideoFilled v-if="course_info.entry_type=='video'"/>
+          <AssignmentSharp v-if="course_info.entry_type=='assignments'"/>
+          <AnnouncementOutlined v-if="course_info.entry_type=='announcements'"/>
+          <ViewModuleRound v-if="course_info.entry_type=='modules'"/>
+          <div v-else> {{ course_info.entry_type }} </div>
+        </n-icon>
+      </n-avatar>
+    </template>
+    <template  #header class="z-2">
+      {{ course_info.title }}
+    </template>
+    <!-- <template  #header-extra class="z-2">
+    </template> -->
+    <template  #description class="z-3">
                   <n-space size="small" style="margin-top: 4px" class="z-3">
                     <n-tag :bordered="false" type="info" size="small">
                       {{ course_info.course_name }}
@@ -59,9 +75,48 @@
                       {{ course_info.entry_type }}
                     </n-tag>
                   </n-space>
-                </template>
-                
-              </n-thing>
+    </template>
+    <div class="priv-item-container flex-col justify-start align-middle max-h-16 overflow-clip">
+        <div v-for="(priv_item, index) in this.limitedPrivData(course_info.priv_data)" :key="index">
+          {{ priv_item[0] }}: {{ priv_item[1] }}
+        </div>
+    </div>
+    <template  #footer class="z-3">
+      Footer
+    </template>
+    <!-- <template  #action class="z-2">
+      <n-space>
+        <n-button size="small">
+          <template #icon>
+            <n-icon>
+              <cash-icon />
+            </n-icon>
+          </template>
+          1$
+        </n-button>
+        <n-button size="small">
+          <template #icon>
+            <n-icon>
+              <cash-icon />
+            </n-icon>
+          </template>
+          10$
+        </n-button>
+        <n-button size="small">
+          <template #icon>
+            <n-icon>
+              <cash-icon />
+            </n-icon>
+          </template>
+          100$
+        </n-button>
+      </n-space>
+    </template> -->
+  </n-thing>
+
+      <template #suffix class="z-3">
+        <n-button class="mr-40 " >Suffix</n-button>
+      </template>
             </n-list-item>
           </n-list>
       </div>
@@ -72,7 +127,7 @@
             <n-button @click="showModal = true">
               Start me up
             </n-button>
-            <n-modal v-model:show="showModal">
+            <!-- <n-modal v-model:show="showModal">
               <n-card
                 style="width: 600px"
                 title="Modal"
@@ -89,6 +144,9 @@
                   Footer
                 </template>
               </n-card>
+            </n-modal> -->
+            <n-modal v-model:show="showCourseModal">
+              <SingleCourseModal :course_info="this.this_course" />
             </n-modal>
           </div>
         </div>
@@ -107,7 +165,7 @@
               <n-drawer-content title="Stoner">
                 Stoner is a 1965 novel by the American writer John Williams.
                 123oiuhoiuhoasdcsdc
-                <GraphComponent />
+                <GraphComponent :init_search="CS1604" />
               </n-drawer-content>
 
             </n-drawer>         
@@ -142,10 +200,17 @@ import { NEmpty } from 'naive-ui';
 import { NModal } from 'naive-ui';
 // import type { DrawerPlacement } from 'naive-ui'
 import { defineComponent, ref } from 'vue'
+import { CashOutline as CashIcon } from "@vicons/ionicons5";
+import { AttachFileFilled } from "@vicons/material";
+import { OndemandVideoFilled } from "@vicons/material";
+import { AssignmentSharp } from "@vicons/material";
+import { ViewModuleRound } from "@vicons/material";
+import { AnnouncementOutlined } from "@vicons/material";
 
 import axios from 'axios';
 // import component GraphComponent.vue from /compoonents dir
 import GraphComponent from '../components/GraphComponent.vue'
+import  SingleCourseModal from '../components/SingleCourseModal.vue'
 
 export default {
   components: {
@@ -154,12 +219,22 @@ export default {
     NEmpty,
     NModal,
     GraphComponent,
+    CashIcon,
+    SingleCourseModal,
+    AttachFileFilled,
+    OndemandVideoFilled,
+    AssignmentSharp,
+    ViewModuleRound,
+    AnnouncementOutlined
   },
   name: 'SearchPage',
   data() {
     return {
       showModal: ref(false),
+      showCourseModal: ref(false),
+      showEntryModal: ref(false),
       activeTab: 0,
+      limit: 4,
       tabs: ['Course Stack', 'Chapter', 'Homework', 'Experiment', 'Reference'],
       cur_search_value: ['all',],
       search_options: [
@@ -177,6 +252,7 @@ export default {
       course_list: [],
       message: "",
       retrieved_list: [],
+      this_course: {},
     };
   },
   computed: {
@@ -186,15 +262,21 @@ export default {
       for (let i=0; i<this.retrieved_list.length; i++) {
         // for each key in this object
         let course_name = "";
+        let course_url = "";
         for (let key in this.retrieved_list[i]) {
-          if (key === "course_name") {
+          if (key === "course_url") {
+            course_url = this.retrieved_list[i][key];
+          } else if (key === "course_name") {
             course_name = this.retrieved_list[i][key];
           } else {
             for (let j=0; j<this.retrieved_list[i][key].length; j++) {
+              let title_ = this.parseTitle(key, this.retrieved_list[i][key][j]);
+              // console.log(title_)
               res_vec.push({
+                title: title_,
                 course_name: course_name,
                 entry_type: key,
-                priv_data: this.retrieved_list[i][key][j]
+                priv_data: this.parsePriv(key, this.retrieved_list[i][key][j])
               });
             }
           }
@@ -204,6 +286,96 @@ export default {
     },
   },
   methods: {
+
+    handleListClick(this_course) {
+      this.this_course = this_course;
+      this.showCourseModal = true;
+    },
+
+
+
+    limitedPrivData(ob) {
+      return Object.entries(ob).slice(2, this.limit);
+    },
+
+    parsePriv(key, priv_data) {
+      let res_obj = {};
+      if (key==="files") {
+        res_obj["name"] = priv_data.file_name;
+        res_obj["description"] = null
+        res_obj["link"] = [priv_data.file_url,];
+        res_obj["extern_obj"] = null;
+        res_obj["type"] = "files"
+        return res_obj;
+      }
+      if (key==="assignments") {
+        res_obj["name"] = priv_data.assign_title;
+        res_obj["description"] = priv_data.assign_message;
+        res_obj["link"] = [priv_data.assign_url,];
+        res_obj["type"] = "assignments"
+        let extern_list = []
+        for (let i=0; i<priv_data.assign_file.length; i++) {
+          extern_list.push(this.parsePriv("files", priv_data.assign_file[i]));
+        }
+        res_obj["extern_obj"] = extern_list;
+        return res_obj;
+      }
+      if (key==="attachments") {
+        res_obj["name"] = priv_data.attachment_name;
+        res_obj["description"] = null;
+        res_obj["link"] = [priv_data.attachment_url,];
+        res_obj["extern_obj"] = null;
+        res_obj["type"] = "files"
+        return res_obj;
+      }
+      if (key === "video") {
+        res_obj["name"] = priv_data.video_discrption;
+        res_obj["description"] = priv_data.video_discrption;
+        res_obj["link"] = [priv_data.video_link1,priv_data.video_link2,];
+        res_obj["extern_obj"] = null;
+        res_obj["type"] = "video"
+        return res_obj;
+      }
+      if (key === "modules") {
+        res_obj["name"] = priv_data.module_name;
+        res_obj["description"] = null;
+        res_obj["link"] = null;
+        let extern_list = []
+        // TODO: data structure is not structured for nesting
+        for (let i=0; i<priv_data.attachments.length; i++) {
+          extern_list.push(this.parsePriv("attachments", priv_data.attachments[i]));
+        }
+        res_obj["type"] = "modules"
+        res_obj["extern_obj"] = extern_list;
+        return res_obj;
+      }
+      if (key === "announcements") {
+        res_obj["name"] = priv_data.ann_title;
+        res_obj["description"] = priv_data.ann_message;
+        res_obj["link"] = [,];
+        res_obj["extern_obj"] = null;
+        res_obj["type"] = "announcements"
+        return res_obj;
+      }
+      console.error("Error: key not found: ", key, priv_data)
+      return null;
+    },
+
+    parseTitle(key, priv_data) {
+      if (key==="files") {
+        return priv_data.file_name;
+      } else if (key==="video") {
+        return priv_data.video_discrption;
+      } else if (key==="assignments") {
+        return priv_data.assign_title;
+      } else if (key==="modules") {
+        return priv_data.module_name;
+      } else if (key==="announcements") {
+        return priv_data.ann_title;
+      } else {
+        console.log(key);
+      }
+    },
     submitValue() {
       this.SendCourseSearch(this.message, this.cur_search_value);
     },

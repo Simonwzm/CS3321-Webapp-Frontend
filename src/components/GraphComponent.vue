@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, defineComponent } from 'vue';
 import axios from 'axios';
 import ECharts from 'vue-echarts';
 import { use } from 'echarts/core';
@@ -93,12 +93,15 @@ use([
 
 axios.defaults.baseURL = 'http://localhost:8080';
 
-export default {
+export default defineComponent({
   name: "GraphComponent",
   components: {
     'v-chart': ECharts
   },
-  setup() {
+  props: {
+    init_search: String
+  },
+  setup(props) {
     const course = ref('CS1604');
     const course_opt = [
       {
@@ -156,37 +159,6 @@ export default {
         });
     }
 
-    // function loadGraphData() {
-    //   axios.get('/graph').then(response => {
-    //     const graph = response.data;
-    //     // log the datas
-    //     console.log(graph);
-    //     chartOption.value = {
-    //       tooltip: {},
-    //       series: [
-    //         {
-    //           type: 'graph',
-    //           layout: 'force',
-    //           data: graph.nodes.map(node => ({
-    //             ...node,
-    //             symbolSize: 10,
-    //             category: node.label,
-    //             draggable: true
-    //           })),
-    //           edges: graph.links.map(link => ({
-    //             ...link,
-    //             value: link.value
-    //           })),
-    //           force: {
-    //             edgeLength: 30,
-    //             repulsion: 250
-    //           },
-    //           categories: [{ name: 'actor' }, { name: 'movie' }],
-    //         }
-    //       ]
-    //     };
-    //   });
-    // }
 function loadGraphData() {
   axios.get('/graph').then(response => {
     const graph = response.data;
@@ -243,7 +215,7 @@ function loadGraphData() {
 
  function loadGraphData2(course) {
       // append course name to url and send get request
-      let url = "http://localhost:8000/course/rels/" + course;
+      let url = "http://localhost:8080/course/rels/" + course;
       console.log(url);
       axios.get(url).then(response => {
         const graph = response.data;
@@ -326,12 +298,13 @@ function loadGraphData() {
 
 
     onMounted(() => {
-      loadGraphData();
+      console.log(props.init_search)
+      loadGraphData2(props.init_search);
     });
 
     return { course, course_opt, searchQuery, movies, movieDetails, search, showMovie, voteInMovie, chartOption, loadGraphData2 , handleGraphChange};
   }
-}
+});
 </script>
 
 <style scoped>
