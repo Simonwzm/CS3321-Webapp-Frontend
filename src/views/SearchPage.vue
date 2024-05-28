@@ -1,8 +1,6 @@
 <template>
 <div class="wrapper flex flex-row justify-center" style="width:1800px">
 <div class="min-h-full  flex flex-col justify-start  w-4/5 " >
-
-
   <div class="flex justify-center items-center space-x-6 pt-4 w-full" style="height:100px"  >
     <div class=" flex items-center h-full  align-middle " v-for="(tab, index) in tabs" :key="index" :class="['tab', { 'active-tab': activeTab === index }]" @click="selectTab(index)">
       {{ tab }}
@@ -19,139 +17,98 @@
         <!-- <img src="../assets/middle-line.png" alt=""> -->
       </div>
       <div class="wrapper1 w-11/12 flex flex-col note-paper2 min-h-full z-1" >
-          <div class="input-search-line h-10 flex-row w-full justify-start items-center">
-            <input class="text-lg h-full font-bold mb-4 w-1/2 border-2 border-gray-300 rounded-lga" placeholder="   result for: naive-ui" v-model="message" @keyup.enter="submitValue" ></input>
-            <div class="select_container w-1/3 ml-10 inline-block h-full z-11" style="line-height:2.5em">
-            <n-space vertical>
-              <n-select v-model:value="cur_search_value" multiple :options="search_options" size="large" />
-            </n-space>
-            </div>
-            <!-- <div class="search-pane inline-flex justify-start align-middle w-1/3 pl-5">
-                <n-button> 111 </n-button> 
-            </div> -->
-
-          </div>
-            <br />
-            <!-- <div class="h-32 bg-gray-200 mb-4" v-for="index in 1" :key="index"></div> -->
-      <!-- <template> -->
-          <!-- </template> -->
-          <div class="empty-show z-2" v-if="false">
-            <div class="empty-bg">
-              Search list empty.
-            </div>
-          </div>
-          <n-list hoverable clickable v-for="course_info in this.flattend_retrieved_list" class="bg-gray-200 mb-20 z-2 bg-opacity-20" @click="handleListClick(course_info)">
-            
-            <n-list-item content-style="z-index:2" >
-              <!-- <template #prefix class="bg-force z-10 w-1000 h-full bg-emerald-200 relative block" > -->
-              <!-- </template> -->
-
-              <div class="bg-force" >
+          <div class="course-stack-view" v-if="this.activeTab==0">
+            <div class="input-search-line h-10 flex-row w-full justify-start items-center">
+              <input class="text-lg h-full font-bold mb-4 w-1/2 border-2 border-gray-300 rounded-lga" placeholder="   result for: naive-ui" v-model="message" @keyup.enter="submitValue" ></input>
+              <div class="select_container w-1/3 ml-10 inline-block h-full z-11" style="line-height:2.5em">
+              <n-space vertical>
+                <n-select v-model:value="cur_search_value" multiple :options="search_options" size="large" />
+              </n-space>
               </div>
-  <n-thing content-indented content-style="margin-top: 0 10px; padding-bottom:0px" style="z-index:2;position:relative" >
-    <template  #avatar class="z-2">
-      <n-avatar>
-        <n-icon>
-          <AttachFileFilled v-if="course_info.entry_type=='files'"/>
-          <OndemandVideoFilled v-if="course_info.entry_type=='video'"/>
-          <AssignmentSharp v-if="course_info.entry_type=='assignments'"/>
-          <AnnouncementOutlined v-if="course_info.entry_type=='announcements'"/>
-          <ViewModuleRound v-if="course_info.entry_type=='modules'"/>
-          <div v-else> {{ course_info.entry_type }} </div>
-        </n-icon>
-      </n-avatar>
-    </template>
-    <template  #header class="z-2">
-      {{ course_info.title }}
-    </template>
-    <!-- <template  #header-extra class="z-2">
-    </template> -->
-    <template  #description class="z-3">
-                  <n-space size="small" style="margin-top: 4px" class="z-3">
-                    <n-tag :bordered="false" type="info" size="small">
-                      {{ course_info.course_name }}
-                    </n-tag>
-                    <n-tag :bordered="false" type="info" size="small">
-                      {{ course_info.entry_type }}
-                    </n-tag>
-                  </n-space>
-    </template>
-    <div class="priv-item-container flex-col justify-start align-middle max-h-16 overflow-clip">
-        <div v-for="(priv_item, index) in this.limitedPrivData(course_info.priv_data)" :key="index">
-          {{ priv_item[0] }}: {{ priv_item[1] }}
-        </div>
-    </div>
-    <template  #footer class="z-3">
-      Footer
-    </template>
-    <!-- <template  #action class="z-2">
-      <n-space>
-        <n-button size="small">
-          <template #icon>
-            <n-icon>
-              <cash-icon />
-            </n-icon>
-          </template>
-          1$
-        </n-button>
-        <n-button size="small">
-          <template #icon>
-            <n-icon>
-              <cash-icon />
-            </n-icon>
-          </template>
-          10$
-        </n-button>
-        <n-button size="small">
-          <template #icon>
-            <n-icon>
-              <cash-icon />
-            </n-icon>
-          </template>
-          100$
-        </n-button>
-      </n-space>
-    </template> -->
-  </n-thing>
-
-      <template #suffix class="z-3">
-        <n-button class="mr-40 " >Suffix</n-button>
+              <!-- <div class="search-pane inline-flex justify-start align-middle w-1/3 pl-5">
+                  <n-button> 111 </n-button> 
+              </div> -->
+  
+            </div>
+            <br />
+            <div class="empty-show z-2" v-if="false">
+              <div class="empty-bg">
+                Search list empty.
+              </div>
+            </div>
+            <n-list  v-for="course_info in this.flattend_retrieved_list" class=" bg-gray-200 mb-20 z-2 bg-opacity-20" >
+              
+              <n-list-item content-style="z-index:2; "  >
+                <!-- <template #prefix class="bg-force z-10 w-1000 h-full bg-emerald-200 relative block" > -->
+                <!-- </template> -->
+  
+                <div class="bg-force" >
+                </div>
+    <n-thing content-indented content-style="margin-top: 0 10px; padding-bottom:0px" style="z-index:2;position:relative; padding-left: 20px; padding-top: 10px" >
+      <template  #avatar class="z-2">
+        <n-avatar>
+          <n-icon>
+            <AttachFileFilled v-if="course_info.entry_type=='files'"/>
+            <OndemandVideoFilled v-if="course_info.entry_type=='video'"/>
+            <AssignmentSharp v-if="course_info.entry_type=='assignments'"/>
+            <AnnouncementOutlined v-if="course_info.entry_type=='announcements'"/>
+            <ViewModuleRound v-if="course_info.entry_type=='modules'"/>
+            <div v-else> {{ course_info.entry_type }} </div>
+          </n-icon>
+        </n-avatar>
       </template>
-            </n-list-item>
-          </n-list>
+      <template  #header class="z-2">
+        {{ course_info.title }}
+      </template>
+      <!-- <template  #header-extra class="z-2">
+      </template> -->
+      <template  #description class="z-3">
+                    <n-space size="small" style="margin-top: 4px" class="z-3">
+                      <n-tag :bordered="false" type="info" size="small">
+                        {{ course_info.course_name }}
+                      </n-tag>
+                      <n-tag :bordered="false" type="info" size="small">
+                        {{ course_info.entry_type }}
+                      </n-tag>
+                    </n-space>
+      </template>
+      <div class="priv-item-container flex-col justify-start align-middle max-h-16 overflow-clip">
+          <div v-for="(priv_item, index) in this.limitedPrivData(course_info.priv_data)" :key="index">
+            {{ priv_item[0] }}: {{ priv_item[1] }}
+          </div>
       </div>
+      <template  #footer class="z-3">
+          <n-rate allow-half clearable color="#4fb233" default-value=3 />
+      </template>
+    </n-thing>
+  
+        <template #suffix class="z-3">
+          <n-button class="mr-40 " @click="handleListClick(course_info)">Details</n-button>
+        </template>
+              </n-list-item>
+            </n-list>
+          </div>
+          <div class="chapter-view" v-if="this.activeTab==1">
+            <FavouriteCourse />
+          </div>
+
+          <div class="course-stack-view" v-if="this.activeTab==0">
+
+          </div>
+      </div>
+      
 
       <div class="flex  flex-col justify-center items-start space-x-6 pt-4 w-1/12 h-full mt-40"   >
         <div class=" flex items-center w-full  align-middle mt-40" style="margin: 50px 0px">
-          <div class="tab2" style="background-color:lightpink">
-            <n-button @click="showModal = true">
-              Start me up
-            </n-button>
-            <!-- <n-modal v-model:show="showModal">
-              <n-card
-                style="width: 600px"
-                title="Modal"
-                :bordered="false"
-                size="huge"
-                role="dialog"
-                aria-modal="true"
-              >
-                <template #header-extra>
-                  Oops!
-                </template>
-                Content
-                <template #footer>
-                  Footer
-                </template>
-              </n-card>
-            </n-modal> -->
+          <div class="tab2" style="background-color:lightpink" @click="addTabIdx">
+              next tab
             <n-modal v-model:show="showCourseModal">
               <SingleCourseModal :course_info="this.this_course" />
             </n-modal>
           </div>
         </div>
         <div class=" flex items-center w-full  align-middle mt-40" style="margin: 50px 0px">
-          <div class="tab2" style="background-color:lightgreen">
+          <div class="tab2" style="background-color:lightgreen" @click="activate('right')">
             <n-button @click="activate('right')">
               Right
             </n-button>
@@ -211,6 +168,7 @@ import axios from 'axios';
 // import component GraphComponent.vue from /compoonents dir
 import GraphComponent from '../components/GraphComponent.vue'
 import  SingleCourseModal from '../components/SingleCourseModal.vue'
+import FavouriteCourse from '../components/FavouriteCourse/FavouriteCourse.vue'
 
 export default {
   components: {
@@ -225,7 +183,8 @@ export default {
     OndemandVideoFilled,
     AssignmentSharp,
     ViewModuleRound,
-    AnnouncementOutlined
+    AnnouncementOutlined,
+    FavouriteCourse
   },
   name: 'SearchPage',
   data() {
@@ -235,7 +194,7 @@ export default {
       showEntryModal: ref(false),
       activeTab: 0,
       limit: 4,
-      tabs: ['Course Stack', 'Chapter', 'Homework', 'Experiment', 'Reference'],
+      tabs: ['Course Stack', 'Statistics', 'Homework', 'Experiment', 'Reference'],
       cur_search_value: ['all',],
       search_options: [
         { label: 'All', value: 'all' },
@@ -243,7 +202,7 @@ export default {
         { label: 'Video', value: 'video' },
         { label: 'Assignment', value: 'assignment' },
         { label: 'File', value: 'file' },
-        { label: 'Moudle', value: 'module' },
+        { label: 'Module', value: 'module' },
       ],
 
       /* drawer vars */
@@ -330,7 +289,7 @@ export default {
       }
       if (key === "video") {
         res_obj["name"] = priv_data.video_discrption;
-        res_obj["description"] = priv_data.video_discrption;
+        res_obj["description"] = priv_data.video_discrption + " " + "video";
         res_obj["link"] = [priv_data.video_link1,priv_data.video_link2,];
         res_obj["extern_obj"] = null;
         res_obj["type"] = "video"
@@ -352,7 +311,7 @@ export default {
       if (key === "announcements") {
         res_obj["name"] = priv_data.ann_title;
         res_obj["description"] = priv_data.ann_message;
-        res_obj["link"] = [,];
+        res_obj["link"] = null;
         res_obj["extern_obj"] = null;
         res_obj["type"] = "announcements"
         return res_obj;
@@ -383,7 +342,9 @@ export default {
     selectTab(index) {
       this.activeTab = index;
     },
-
+    addTabIdx() {
+      this.activeTab = (this.activeTab + 1) % this.tabs.length;
+    },
     activate(place) {
       this.active = true;
       this.placement = place;
@@ -466,6 +427,7 @@ z-index: 0;
 }
 
 .tab2 {
+
   background-color: aliceblue;
   padding: 10px 30px;
   margin: 0 5px;
@@ -481,6 +443,8 @@ z-index: 0;
 
 .tab2:hover {
   width: 115px;
+  /* set mouse clickable */
+  cursor: pointer;
 }
 
 .active-tab {
