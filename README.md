@@ -4,7 +4,7 @@
 
 这是 CS3321 数据库最终项目的子模块。该仓库充当我们的项目 Course-Stack 数据库 Web 应用程序的前端。
 
-有关 Course-Stack 的更多信息，请参阅我们的主要仓库。
+有关 Course-Stack 的更多信息，请参阅我们的[主要仓库](https://github.com/Simonwzm/CS3321-Course-Stack)。
 
 前端使用vue3+vitejs进行热重载和快速开发。我们使用 [naive-ui](https://www.naiveui.com/) 作为 UI 框架，使用 [tailwind-css](https://tailwindcss.com/) 作为 post-css-processor 来实现方便但优雅的设计。
 
