@@ -55,9 +55,8 @@
       </div>
 
     </div>
-    <n-space vertical>
+    <n-space vertical style="overflow: visible;">
       <n-select v-model:value="course" :options="course_opt" @update:value="handleGraphChange" />
-      <n-select v-model:value="course" disabled :options="course_opt" />
     </n-space>
     <div class="switch-graph">
       <button @click="loadGraphData2()">Switch Graph</button>
@@ -83,12 +82,15 @@ import {
   GridComponent
 } from 'echarts/components';
 
+import { LegendComponent } from 'echarts/components';
+
 use([
   CanvasRenderer,
   GraphChart,
   TitleComponent,
   TooltipComponent,
-  GridComponent
+  GridComponent,
+  LegendComponent
 ]);
 
 axios.defaults.baseURL = 'http://localhost:8080';
@@ -102,7 +104,7 @@ export default defineComponent({
     init_search: String
   },
   setup(props) {
-    const course = ref('CS1604');
+    const course = props.init_search;
     const course_opt = [
       {
         label: 'CS1604',
