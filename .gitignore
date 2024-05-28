@@ -29,3 +29,4 @@ coverage
 
 *.tsbuildinfo
 .vscode/
+tailwind.config.js
