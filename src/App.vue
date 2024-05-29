@@ -21,7 +21,9 @@ import HelloWorld from './components/HelloWorld.vue'
     </div>
   </header> -->
 
+<n-message-provider>
   <RouterView style=""/>
+</n-message-provider>
 </template>
 
 <style >
@@ -39,7 +41,7 @@ body {
   /* full size backgroud, no repeat */
   /* background-size:  */
   /* background-size: 100% 100%; */
-    background-attachment: fixed;
+  background-attachment: fixed;
 
   background-size: contain;
   background-repeat: no-repeat;

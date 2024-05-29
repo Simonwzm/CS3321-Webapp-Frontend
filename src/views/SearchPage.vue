@@ -1,6 +1,7 @@
 <template>
-<div class="wrapper flex flex-row justify-center" style="width:1800px">
-<div class="min-h-full  flex flex-col justify-start  w-4/5 " >
+  <div class="wrapper flex flex-row justify-center" style="width:1800px">
+    <div class="min-h-full  flex flex-col justify-start  w-4/5 " >
+  <n-scrollbar>
   <div class="flex justify-center items-center space-x-6 pt-4 w-full" style="height:100px"  >
     <div class=" flex items-center h-full  align-middle " v-for="(tab, index) in tabs" :key="index" :class="['tab', { 'active-tab': activeTab === index }]" @click="selectTab(index)">
       {{ tab }}
@@ -73,15 +74,17 @@
                     </n-space>
       </template>
       <div class="priv-item-container flex-col justify-start align-middle max-h-16 overflow-clip">
-          <div v-for="(priv_item, index) in this.limitedPrivData(course_info.priv_data)" :key="index">
-            {{ priv_item[0] }}: {{ priv_item[1] }}
+          <div>
+            <!-- {{ priv_item[0] }}: {{ priv_item[1] }} -->
+              Click Detail for more info
           </div>
+            <br/>
       </div>
-      <template  #footer class="z-3">
-          <n-rate allow-half clearable color="#4fb233" default-value=3 />
+      <template  #footer class="z-a3">
+          <n-rate allow-half clearable color="#4fb233" />
       </template>
     </n-thing>
-  
+   
         <template #suffix class="z-3">
           <n-button class="mr-40 " @click="handleListClick(course_info)">Details</n-button>
         </template>
@@ -90,6 +93,10 @@
           </div>
           <div class="chapter-view" v-if="this.activeTab==1">
             <FavouriteCourse />
+          </div>
+
+          <div class="chapter-view" v-if="this.activeTab==2">
+            <AddCourse />
           </div>
 
           <div class="course-stack-view" v-if="this.activeTab==0">
@@ -110,7 +117,7 @@
         <div class=" flex items-center w-full  align-middle mt-40" style="margin: 50px 0px">
           <div class="tab2" style="background-color:lightgreen" @click="activate('right')">
             <n-button @click="activate('right')">
-              Right
+              <span> -> </span>
             </n-button>
             <n-drawer
               v-model:show="active"
@@ -130,10 +137,10 @@
           </div>
         </div>
         <div class=" flex items-center w-full  align-middle mt-40" style="margin: 50px 0px">
-          <div class="tab2" style="background-color:lightskyblue">
-            <button class="btnn" style="width: 100%; height: 100%; border: none; background: none; color: inherit" @click="showModal = true">
+          <div class="tab2" style="background-color:lightskyblue" @click="minusTabIdx">
+            <!-- <button class="btnn" style="width: 100%; height: 100%; border: none; background: none; color: inherit" @click="showModal = true">
               123
-            </button>
+            </button> -->
           </div>
         </div>
 
@@ -146,6 +153,7 @@
 
     </div>
   </div>
+</n-scrollbar> 
 </div>
 </div>
 </template>
@@ -169,6 +177,7 @@ import axios from 'axios';
 import GraphComponent from '../components/GraphComponent.vue'
 import  SingleCourseModal from '../components/SingleCourseModal.vue'
 import FavouriteCourse from '../components/FavouriteCourse/FavouriteCourse.vue'
+import AddCourse from '../components/AddCourse/AddCourse.vue'
 
 export default {
   components: {
@@ -184,7 +193,8 @@ export default {
     AssignmentSharp,
     ViewModuleRound,
     AnnouncementOutlined,
-    FavouriteCourse
+    FavouriteCourse,
+    AddCourse
   },
   name: 'SearchPage',
   data() {
@@ -344,6 +354,9 @@ export default {
     },
     addTabIdx() {
       this.activeTab = (this.activeTab + 1) % this.tabs.length;
+    },
+    minusTabIdx() {
+      this.activeTab = (this.activeTab - 1) % this.tabs.length;
     },
     activate(place) {
       this.active = true;

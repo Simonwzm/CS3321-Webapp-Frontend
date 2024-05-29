@@ -40,15 +40,15 @@
             </n-card>
             <div class="extern-container mt-8 "  v-if="course_info.priv_data.extern_obj" style="overflow:scroll; max-height: 750px;">
                 <n-scrollbar style="max-height: 760px" trigger="none">
-                <n-collapse>
-                    <n-collapse-item title="External Files" name="1">
-                        <n-space vertical :size="12" v-for="extern_file in course_info.priv_data.extern_obj">
-                            <SingleFileModal :fileData="extern_file"></SingleFileModal>
-                        </n-space>
-                    </n-collapse-item>
+                  <n-collapse>
+                      <n-collapse-item title="External Files" name="1">
+                          <n-space vertical :size="12" v-for="extern_file in course_info.priv_data.extern_obj">
+                              <SingleFileModal :fileData="extern_file"></SingleFileModal>
+                          </n-space>
+                      </n-collapse-item>
 
-                </n-collapse>
-            </n-scrollbar>
+                  </n-collapse>
+                </n-scrollbar>
                 </div>
         </div>
 
