@@ -53,6 +53,9 @@
       <n-form-item-gi :span="24" label="Grade" path="gradeValue">
             <n-input v-model:value="item.module_name" clearable />
       </n-form-item-gi>
+      <n-form-item-gi :span="24" label="Grade" path="gradeValue">
+            <n-input v-model:value="item.module_id" clearable />
+      </n-form-item-gi>
       </n-grid>
             <n-button style="margin-left: 12px" @click="removeItem(index)">
               删除
@@ -75,7 +78,7 @@
             <n-input v-model:value="item.file_id" clearable />
       </n-form-item-gi>
       <n-form-item-gi :span="24" label="Grade" path="gradeValue">
-            <n-input v-model:value="item.file_title" clearable />
+            <n-input v-model:value="item.file_name" clearable />
       </n-form-item-gi>
       <n-form-item-gi :span="24" label="Grade" path="gradeValue">
             <n-input v-model:value="item.file_url" clearable />
@@ -201,8 +204,8 @@
         <n-button attr-type="button" @click="addItem">
           增加
         </n-button>
-        <n-button @click="emit2parent" type="primary" round >
-          Confirm
+        <n-button @click="$emit('updateFileForm', model)" type="primary" round >
+          Next
         </n-button>
       </n-space>
     </n-form-item>
@@ -213,6 +216,7 @@
 import { defineComponent, reactive, ref } from "vue";
 
 export default defineComponent({
+  emits: ["updateFileForm"],
   setup() {
     const formRef = ref(null);
     const add_type = ref("module");
@@ -292,27 +296,6 @@ export default defineComponent({
       item = new_item;
     };
     
-    const handleKindChange = (item) => {
-      console.log(item);
-      switch (item.kind) {
-        case "module":
-          createModTemplate(item);
-          break;
-        case "file":
-          createFilTemplate(item);
-          break;
-        case "video":
-          createVideoTemplate(item);
-          break;
-        case "announcement":
-          createAnnTemplate(item);
-          break;
-        case "assignment":
-          createAssTemplate(item);
-          break;
-      }
-    };
-
 
     return {
       createAnnTemplate,
@@ -327,7 +310,6 @@ export default defineComponent({
       addItem,
       removeItem,
       handleValidateClick,
-      handleKindChange,
     };
   }
 });

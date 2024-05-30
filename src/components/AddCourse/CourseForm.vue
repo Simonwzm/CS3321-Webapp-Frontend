@@ -24,9 +24,32 @@
     label-placement="top"
   >
     <n-grid :cols="24" :x-gap="24">
-      <n-form-item-gi :span="24" label="Course Name" path="courseName">
+      <n-form-item-gi :span="12" label="Course Name" path="courseName">
         <n-input v-model:value="model.courseName" placeholder="Input" />
       </n-form-item-gi>
+      <n-form-item-gi :span="12" label="Course Url" path="courseUrl">
+        <n-input v-model:value="model.courseUrl" placeholder="Input" />
+      </n-form-item-gi>
+
+      <n-form-item-gi :span="12" label="Course ID" path="course_id">
+        <n-input v-model:value="model.course_id" placeholder="Input" />
+      </n-form-item-gi>
+      <n-form-item-gi :span="12" label="Course Teacher" path="assign_id">
+        <n-input v-model:value="model.assign_id" placeholder="Input" />
+      </n-form-item-gi>
+      
+
+      <n-form-item-gi :span="12" label="Grade" path="gradeValue">
+        <n-select
+          v-model:value="model.gradeValue"
+          placeholder="Select Grade From drawer here"
+          :options="gradeOptions"
+        />
+      </n-form-item-gi>
+      <n-form-item-gi :span="12" label="Students Number" path="rateValue">
+        <n-input-number v-model:value="model.idField.rateValue" />
+      </n-form-item-gi>
+
       <n-form-item-gi :span="24" label="Course Descriptions" path="remarkValue">
         <n-input
           v-model:value="model.remarkValue"
@@ -38,24 +61,6 @@
           }"
         />
       </n-form-item-gi>
-      <n-form-item-gi :span="24" label="Grade" path="gradeValue">
-        <n-select
-          v-model:value="model.gradeValue"
-          placeholder="Select Grade From drawer here"
-          :options="gradeOptions"
-        />
-      </n-form-item-gi>
-
-      <n-form-item-gi :span="24" label="Course ID" path="file_id">
-        <n-input v-model:value="model.file_id" placeholder="Input" />
-      </n-form-item-gi>
-      <n-form-item-gi :span="24" label="Course Teacher" path="assign_id">
-        <n-input v-model:value="model.assign_id" placeholder="Input" />
-      </n-form-item-gi>
-      
-      <n-form-item-gi :span="24" label="Students Number" path="rateValue">
-        <n-input-number v-model:value="model.idField.rateValue" />
-      </n-form-item-gi>
     <n-form-item-gi
         v-for="(item, index) in model.idField.module_id"
         :key="index"
@@ -63,7 +68,7 @@
         :path="`module_id[${index}].module_id`"
         :span="24"
         :rule="{
-        required: true,
+        required: false,
         message: `Please enter module_id${index + 1}`,
         trigger: ['input', 'blur']
         }"
@@ -78,8 +83,8 @@
             <n-button round attr-type="button" @click="addItem" style=" margin-right: 12px; background-color: lightblue; color:white">
             Add module
             </n-button>
-            <n-button round attr-type="button" @click="handleSubmission" style=" margin-right: 12px; background-color: lightpink; color:white">
-            Submit
+            <n-button round attr-type="button" @click="$emit('updateCourseForm', model)" style=" margin-right: 12px; background-color: lightpink; color:white">
+            Next
             </n-button>
           <n-button round type="primary" @click="handleValidateButtonClick">
             Check
@@ -89,7 +94,7 @@
     </n-grid>
   </n-form>
 
-  <pre>{{ JSON.stringify(model, null, 2) }}
+  <pre v-if="false">{{ JSON.stringify(model, null, 2) }}
 </pre>
 </template>
 
@@ -99,6 +104,7 @@ import { useMessage } from "naive-ui";
 
 
 export default defineComponent({
+  emits: ["updateCourseForm"],
   setup() {
 
     const formRef = ref(null);
@@ -106,6 +112,7 @@ export default defineComponent({
     const model = reactive({
         courseName: null,
         gradeValue: null,
+        courseUrl: null,
         idField: {
             rateValue: null,
             module_id: [{ dule_id: ""}],
@@ -119,7 +126,7 @@ export default defineComponent({
     };
     
     const addItem = () => {
-      model.module_id.push({ module_id: "" });
+      model.idField.module_id.push({ module_id: "" });
     };
 
     return {
@@ -136,14 +143,19 @@ export default defineComponent({
         courseName: {
           required: true,
           trigger: ["blur", "input"],
-          message: "请输入 inputValue"
+          message: "请输入 courseName"
+        },
+        courseUrl: {
+          required: true,
+          trigger: ["blur", "input"],
+          message: "请输入 courseUrl"
         },
         remarkValue: {
           required: true,
           trigger: ["blur", "input"],
           message: "请输入 remarks"
         },
-        file_id: {
+        course_id: {
           required: true,
           trigger: ["blur", "change"],
           message: "请选择 selectValue"
@@ -160,7 +172,7 @@ export default defineComponent({
         },
         rateValue: {
           type: "number",
-          required: true,
+          required: false,
           trigger: ["blur", "change"],
           message: "请输入 Rate number"
         },
@@ -176,11 +188,6 @@ export default defineComponent({
           }
         });
       },
-      handleSubmission() {
-        let new_model = JSON.parse(JSON.stringify(model));
-        new_model['data'] = null;
-        console.log(new_model);
-      }
     };
   }
 });

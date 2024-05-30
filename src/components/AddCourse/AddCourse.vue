@@ -27,8 +27,8 @@
       </div>
       <div class="w-full min-h-24">
         <div class="form">
-          <CourseForm v-if="current==1" />
-          <FileForm v-if="current==2" />
+          <CourseForm v-if="current==1" @updateCourseForm="callbackUCF" />
+          <FileForm v-if="current==2" @updateFileForm="callbackUFF" />
         </div>
 
       </div>
@@ -73,6 +73,7 @@ import { defineComponent, ref } from "vue";
 import { MdArrowRoundBack, MdArrowRoundForward } from "@vicons/ionicons4";
 import CourseForm from "./CourseForm.vue";
 import FileForm from "./FileForm.vue";
+import axios from 'axios';
 export default defineComponent({
   components: {
     MdArrowRoundBack,
@@ -87,7 +88,76 @@ export default defineComponent({
       2: "Add course files",
       3: "Permission Control"
     };
+
+    const callbackUFF = (FF_model) => {
+      // console.log(FF_model);
+      // console.log("---------");
+      let obj_list = FF_model.updateData;
+      let classname_ = FF_model.name;
+      let payload_obj_list = [];
+      for (let i = 0; i < obj_list.length; i++) {
+        let payload_obj = {
+          classname: classname_,
+        }
+        payload_obj.moduleName = [obj_list[i].kind+'s'];
+        if (payload_obj.moduleName[0] == "videos") {
+          payload_obj.moduleName[0] = "video";
+        }
+        payload_obj.data = {}
+        if (obj_list[i].kind == "module") {
+          payload_obj.data.module_name = obj_list[i].module_name;
+          payload_obj.data.module_id = obj_list[i].module_id;
+          payload_obj.data.attachments = null;
+        } else if (obj_list[i].kind == "file") {
+          payload_obj.data.file_id = obj_list[i].file_id;
+          payload_obj.data.file_url = obj_list[i].file_url;
+          payload_obj.data.file_name = obj_list[i].file_name;
+        } else if (obj_list[i].kind == "video") {
+          payload_obj.data.video_discrption = obj_list[i].video_discrption;
+          payload_obj.data.video_id = obj_list[i].video_id;
+          payload_obj.data.video_link1 = obj_list[i].video_link1;
+          payload_obj.data.video_link2 = obj_list[i].video_link2;
+        } else if (obj_list[i].kind == "announcement") {
+          payload_obj.data.ann_id = obj_list[i].ann_id;
+          payload_obj.data.ann_message = obj_list[i].ann_message;
+          payload_obj.data.ann_title = obj_list[i].ann_title;
+        } else if (obj_list[i].kind == "assignment") {
+          payload_obj.data.assign_message = obj_list[i].assign_message;
+          payload_obj.data.assign_id = obj_list[i].assign_id;
+        }
+        payload_obj_list.push(payload_obj);
+      }
+      // console.log(payload_obj_list);
+      
+      // send the payload_obj in list one by one
+      for (let i = 0; i < payload_obj_list.length; i++) {
+        console.log(payload_obj_list[i]);
+        axios.post('http://localhost:3000/insert', payload_obj_list[i]).then((response) => {
+          console.log(response.data);
+        }).catch((error) => {
+          console.log(error);
+        });
+      }
+    };
+    const callbackUCF = (CF_model) => {
+      console.log(CF_model);
+      let payload_obj = {
+        course_name: CF_model.courseName,
+        course_url: CF_model.courseUrl,
+        course_id: CF_model.course_id,
+      }
+      console.log(payload_obj)
+
+      axios.post('http://localhost:3000/create', payload_obj).then((response) => {
+        console.log(response.data);
+      }).catch((error) => {
+        console.log(error);
+      });
+
+    };
     return {
+      callbackUFF,
+      callbackUCF,
       stepid2formtitle,
       currentStatus: ref("process"),
       current: currentRef,

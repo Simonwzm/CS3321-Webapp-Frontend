@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper flex flex-row justify-center" style="width:1800px">
     <div class="min-h-full  flex flex-col justify-start  w-4/5 " >
-  <n-scrollbar>
+      <n-scrollbar trigger="none">
   <div class="flex justify-center items-center space-x-6 pt-4 w-full" style="height:100px"  >
     <div class=" flex items-center h-full  align-middle " v-for="(tab, index) in tabs" :key="index" :class="['tab', { 'active-tab': activeTab === index }]" @click="selectTab(index)">
       {{ tab }}
@@ -19,6 +19,8 @@
       </div>
       <div class="wrapper1 w-11/12 flex flex-col note-paper2 min-h-full z-1" >
           <div class="course-stack-view" v-if="this.activeTab==0">
+
+            <n-spin :show="isLoading">
             <div class="input-search-line h-10 flex-row w-full justify-start items-center">
               <input class="text-lg h-full font-bold mb-4 w-1/2 border-2 border-gray-300 rounded-lga" placeholder="   result for: naive-ui" v-model="message" @keyup.enter="submitValue" ></input>
               <div class="select_container w-1/3 ml-10 inline-block h-full z-11" style="line-height:2.5em">
@@ -37,7 +39,9 @@
                 Search list empty.
               </div>
             </div>
+
             <n-list  v-for="course_info in this.flattend_retrieved_list" class=" bg-gray-200 mb-20 z-2 bg-opacity-20" >
+
               
               <n-list-item content-style="z-index:2; "  >
                 <!-- <template #prefix class="bg-force z-10 w-1000 h-full bg-emerald-200 relative block" > -->
@@ -90,6 +94,7 @@
         </template>
               </n-list-item>
             </n-list>
+            </n-spin>
           </div>
           <div class="chapter-view" v-if="this.activeTab==1">
             <FavouriteCourse />
@@ -99,6 +104,9 @@
             <AddCourse />
           </div>
 
+          <div class="chapter-view" v-if="this.activeTab==3">
+            <UserPane />
+          </div>
           <div class="course-stack-view" v-if="this.activeTab==0">
 
           </div>
@@ -126,10 +134,17 @@
               resizable
             >
 
-              <n-drawer-content title="Stoner">
-                Stoner is a 1965 novel by the American writer John Williams.
-                123oiuhoiuhoasdcsdc
-                <GraphComponent :init_search="CS1604" />
+              <n-drawer-content title="Neo4j Pane">
+                <!-- <n-split direction="vertical" style="height: 100%">
+                  <template #1>
+                    <GraphComponent :init_search="CS1604" />
+                  </template>
+                  <template #2>
+                    <GraphControlPane />
+                  </template>
+                </n-split> -->
+
+                <GraphControlDrawer :init_search="'CS1604'" />
               </n-drawer-content>
 
             </n-drawer>         
@@ -153,9 +168,9 @@
 
     </div>
   </div>
-</n-scrollbar> 
-</div>
-</div>
+      </n-scrollbar> 
+    </div>
+  </div>
 </template>
 
 <script>
@@ -178,6 +193,8 @@ import GraphComponent from '../components/GraphComponent.vue'
 import  SingleCourseModal from '../components/SingleCourseModal.vue'
 import FavouriteCourse from '../components/FavouriteCourse/FavouriteCourse.vue'
 import AddCourse from '../components/AddCourse/AddCourse.vue'
+import GraphControlDrawer from '../components/GraphControlPane/GraphControlDrawer.vue'
+import UserPane from '../components/UserPane/UserPane.vue'
 
 export default {
   components: {
@@ -194,11 +211,14 @@ export default {
     ViewModuleRound,
     AnnouncementOutlined,
     FavouriteCourse,
-    AddCourse
+    AddCourse,
+    GraphControlDrawer,
+    UserPane
   },
   name: 'SearchPage',
   data() {
     return {
+      isLoading: false,
       showModal: ref(false),
       showCourseModal: ref(false),
       showEntryModal: ref(false),
@@ -364,15 +384,23 @@ export default {
     },
 
     SendCourseSearch(title, modules) {
-      // send post request to localhost:3000/search with parameter title and module as payload
-      axios.post('http://localhost:3001/search', {
+      // Set the loading status to true before sending the request
+      this.isLoading = true;
+
+      axios.post('http://localhost:3000/search', {
         keyword: title,
         modules: modules
-      }).then((response) => {
+      })
+      .then((response) => {
         this.retrieved_list = response.data[0];
         console.log(this.retrieved_list);
-      }).catch((error) => {
+      })
+      .catch((error) => {
         console.log(error);
+      })
+      .finally(() => {
+        // Set the loading status to false after the request is complete
+        this.isLoading = false;
       });
     }
   },
