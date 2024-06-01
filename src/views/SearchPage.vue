@@ -124,38 +124,23 @@
         </div>
         <div class=" flex items-center w-full  align-middle mt-40" style="margin: 50px 0px">
           <div class="tab2" style="background-color:lightgreen" @click="activate('right')">
-            <n-button @click="activate('right')">
-              <span> -> </span>
-            </n-button>
+            Neo4j
             <n-drawer
               v-model:show="active"
               :default-width="1024"
               :placement="placement"
               resizable
             >
-
               <n-drawer-content title="Neo4j Pane">
-                <!-- <n-split direction="vertical" style="height: 100%">
-                  <template #1>
-                    <GraphComponent :init_search="CS1604" />
-                  </template>
-                  <template #2>
-                    <GraphControlPane />
-                  </template>
-                </n-split> -->
-
                 <GraphControlDrawer :init_search="'CS1604'" />
               </n-drawer-content>
-
             </n-drawer>         
 
           </div>
         </div>
         <div class=" flex items-center w-full  align-middle mt-40" style="margin: 50px 0px">
           <div class="tab2" style="background-color:lightskyblue" @click="minusTabIdx">
-            <!-- <button class="btnn" style="width: 100%; height: 100%; border: none; background: none; color: inherit" @click="showModal = true">
-              123
-            </button> -->
+            prev
           </div>
         </div>
 

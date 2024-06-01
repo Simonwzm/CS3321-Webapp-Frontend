@@ -27,8 +27,25 @@
       </div>
       <div class="w-full min-h-24">
         <div class="form">
+          <n-collapse-transition :show="current==1">
           <CourseForm v-if="current==1" @updateCourseForm="callbackUCF" />
+          </n-collapse-transition> 
+          <n-collapse-transition :show="current==2">
           <FileForm v-if="current==2" @updateFileForm="callbackUFF" />
+          </n-collapse-transition> 
+
+          <n-collapse-transition :show="current==3">
+            <div v-if="current==3">
+              <n-result status="success" title="Success" >
+                <n-gradient-text :size="24" type="success" style="text-align: center; margin-left: auto; margin-right:auto; width:100%;">
+                  Successfully created {{ prev_added_course.courseName }}
+                </n-gradient-text>
+                <template #footer>
+                  <n-button @click="() => {current = 1;}">继续添加</n-button>
+                </template>
+              </n-result>
+            </div>
+          </n-collapse-transition>
         </div>
 
       </div>
@@ -50,7 +67,7 @@
           </template>
         </n-button>
       </n-button-group>
-      <n-radio-group v-model:value="currentStatus" size="medium" name="basic">
+      <!-- <n-radio-group v-model:value="currentStatus" size="medium" name="basic">
         <n-radio-button value="error">
           Error
         </n-radio-button>
@@ -63,7 +80,7 @@
         <n-radio-button value="finish">
           Finish
         </n-radio-button>
-      </n-radio-group>
+      </n-radio-group> -->
     </n-space>
   </div>
 </template>
@@ -97,7 +114,7 @@ export default defineComponent({
       let payload_obj_list = [];
       for (let i = 0; i < obj_list.length; i++) {
         let payload_obj = {
-          classname: classname_,
+          className: classname_,
         }
         payload_obj.moduleName = [obj_list[i].kind+'s'];
         if (payload_obj.moduleName[0] == "videos") {
@@ -134,22 +151,44 @@ export default defineComponent({
         console.log(payload_obj_list[i]);
         axios.post('http://localhost:3000/insert', payload_obj_list[i]).then((response) => {
           console.log(response.data);
+          next();
         }).catch((error) => {
           console.log(error);
         });
       }
     };
+
+    const next = () => {
+      if (currentRef.value === null)
+        currentRef.value = 1;
+      else if (currentRef.value >= 4)
+        currentRef.value = null;
+      else
+        currentRef.value++;
+    };
+
+    const prev = () => {
+      if (currentRef.value === 0)
+        currentRef.value = null;
+      else if (currentRef.value === null)
+        currentRef.value = 4;
+      else
+        currentRef.value--;
+    };
+
     const callbackUCF = (CF_model) => {
       console.log(CF_model);
       let payload_obj = {
-        course_name: CF_model.courseName,
-        course_url: CF_model.courseUrl,
-        course_id: CF_model.course_id,
+        courseName: CF_model.courseName,
+        courseUrl: CF_model.courseUrl,
+        courseId: CF_model.course_id,
       }
+      prev_added_course.value = payload_obj;
       console.log(payload_obj)
 
       axios.post('http://localhost:3000/create', payload_obj).then((response) => {
         console.log(response.data);
+        next();
       }).catch((error) => {
         console.log(error);
       });
@@ -161,22 +200,11 @@ export default defineComponent({
       stepid2formtitle,
       currentStatus: ref("process"),
       current: currentRef,
-      next() {
-        if (currentRef.value === null)
-          currentRef.value = 1;
-        else if (currentRef.value >= 4)
-          currentRef.value = null;
-        else
-          currentRef.value++;
-      },
-      prev() {
-        if (currentRef.value === 0)
-          currentRef.value = null;
-        else if (currentRef.value === null)
-          currentRef.value = 4;
-        else
-          currentRef.value--;
-      }
+      next,
+      prev,
+      prev_added_course: ref({
+        courseName: "Not a Course",
+      }),
     };
   }
 });
