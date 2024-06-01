@@ -25,9 +25,10 @@ const router = createRouter({
       component: MainPage
     },
     {
-      path: '/searchpage',
+      path: '/searchpage/:init_message',
       name: 'SearchPage',
-      component: SearchPage
+      component: SearchPage,
+      props: true
     },
     {
       path: '/GraphViz',

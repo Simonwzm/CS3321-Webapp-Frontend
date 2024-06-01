@@ -25,4 +25,14 @@ export default {
 </script>
 
 <style scoped>
+.sc-container {
+  /* set initial transition time */
+  transition-duration: 0.2s;
+  transition-property: color, background;
+}
+
+.sc-container:hover {
+  color: wheat;
+  background: linear-gradient(315deg, hsl(276, 79%, 69%) 25%, hsl(173, 90%, 30%));
+}
 </style>

@@ -201,6 +201,9 @@ export default {
     UserPane
   },
   name: 'SearchPage',
+  props: {
+    init_message: String
+  },
   data() {
     return {
       isLoading: false,
@@ -224,7 +227,6 @@ export default {
       active: false,
       placement: "right",
       course_list: [],
-      message: "",
       retrieved_list: [],
       this_course: {},
     };
@@ -258,6 +260,9 @@ export default {
       }
       return res_vec;
     },
+    message() {
+      return this.init_message;
+    }
   },
   methods: {
 
@@ -389,6 +394,10 @@ export default {
       });
     }
   },
+  
+  mounted() {
+    this.SendCourseSearch(this.message, this.cur_search_value);
+  }
 };
 </script>
 

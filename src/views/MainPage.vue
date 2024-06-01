@@ -12,7 +12,7 @@
           <img src="../assets/mainpageup.png" alt="" class="csst w-full">
           <div class="flex justify-center items-center w-full">
             <div class="relative w-full">
-              <input class="border-2 border-gray-300 rounded-full py-3 pl-6 pr-12 w-3/5 mt-6" type="search" placeholder="Search">
+              <input class="border-2 border-gray-300 rounded-full py-3 pl-6 pr-12 w-3/5 mt-6" type="search" placeholder="Search"  v-model="message" @keyup.enter="submitValue">
               <button class="absolute right-0 top-0 mt-2 mr-4">
                 <i class="fas fa-search text-gray-500"></i>
               </button>
@@ -37,6 +37,18 @@
 export default {
   name: 'MainPage',
   // Here you can include your Vue component's data, methods, etc.
+    data() {
+      return {
+        message: ''
+      }
+    },
+    methods: {
+      submitValue() {
+        console.log(this.message)
+        this.$router.push({ name: 'SearchPage', params: { init_message: this.message } });
+
+      }
+    }
 };
 </script>
 

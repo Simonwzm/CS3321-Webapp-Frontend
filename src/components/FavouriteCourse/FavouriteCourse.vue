@@ -3,7 +3,7 @@
     <div class="text-3xl font-semibold mb-6">General Statistics</div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <StatCard title="Total Courses" value="8/44" icon="fas fa-dollar-sign" change="+8"></StatCard>
-      <StatCard style="background: linear-gradient(315deg,hsl(276, 79%, 69%) 25%,hsl(173, 90%, 30%))"  title="Total Users" value="2" icon="fas fa-users" change="+2"></StatCard>
+      <StatCard  title="Total Users" value="2" icon="fas fa-users" change="+2"></StatCard>
       <StatCard title="Mongo Collections" value="264" icon="fas fa-user-check" change="+4"></StatCard>
       <StatCard title="Neo4j-Graphs" value="5/6" icon="fas fa-shopping-cart" change="-1"></StatCard>
     </div>
@@ -80,4 +80,5 @@ export default {
 * {
   font-family: 'Inter', sans-serif;
 }
+
 </style>
